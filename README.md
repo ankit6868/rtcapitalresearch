@@ -26,17 +26,16 @@ Open `http://localhost:3000` for the site, `http://localhost:3000/login` for adm
 
 Without Supabase env vars set, the app uses local JSON files under `./data/` (gitignored). Great for dev.
 
-## Deploy to Vercel + Supabase
+## Deploy to Vercel + Supabase (zero-config)
 
-1. Create a Supabase project.
-2. Paste [`supabase/migrations/001_init.sql`](supabase/migrations/001_init.sql) into the SQL editor and run it.
-3. In Vercel, set env vars from [`.env.example`](.env.example):
-   - `SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `AUTH_SECRET` (generate: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`)
-4. Push this repo to GitHub, import in Vercel, deploy.
+1. Import this repo into Vercel.
+2. In the project sidebar: **Storage → Create Database → Supabase**. This auto-injects every Supabase and Postgres env var into your project.
+3. Add one env var yourself: `AUTH_SECRET` (Vercel has a Generate button).
+4. Deploy. Visit the site — the app auto-creates all tables and seeds the default admin user on the first request. No SQL to paste.
 
-Full step-by-step in [`SUPABASE_SETUP.md`](SUPABASE_SETUP.md).
+Login at `/login` with `admin` / `admin123` and change the password from Admin → Account.
+
+Full step-by-step and alternatives in [`SUPABASE_SETUP.md`](SUPABASE_SETUP.md).
 
 ## Project layout
 

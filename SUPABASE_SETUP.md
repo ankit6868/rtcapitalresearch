@@ -1,112 +1,90 @@
-# Supabase setup
+# Deploy to Vercel + Supabase (zero-config path)
 
-The app auto-detects which backend to use:
-
-- **If `SUPABASE_URL` and `SUPABASE_SERVICE_ROLE_KEY` are set** → uses Supabase (Postgres).
-- **Otherwise** → uses local JSON files under `./data/` (great for dev, not for production).
-
-Follow these steps to move to Supabase.
+**TL;DR:** Import repo into Vercel → Connect Supabase from Vercel Storage → Deploy → Done.
+The app auto-creates all its tables and seeds defaults on the first request. You never touch SQL.
 
 ---
 
-## 1. Create the project
+## Recommended: Vercel + Supabase integration (no SQL editor needed)
 
-1. Go to [supabase.com](https://supabase.com) and sign in.
-2. **New Project** → give it a name (e.g. `rt-capital-research`), pick a region close to your users, and set a database password.
-3. Wait ~2 minutes while the project provisions.
+1. **Push this repo to GitHub** (already done if you're reading this from the pushed copy).
+2. In [Vercel](https://vercel.com), click **New Project** → import the GitHub repo.
+3. Before deploying, click **Storage** in the project sidebar → **Create Database** → pick **Supabase** → choose a region.
+   - This provisions a new Supabase project and **auto-injects all connection env vars** into your Vercel project:
+     - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`
+     - `POSTGRES_URL`, `POSTGRES_URL_NON_POOLING`, `POSTGRES_HOST`, `POSTGRES_PASSWORD`, etc.
+4. Add ONE more env var yourself:
+   - `AUTH_SECRET` — a random 64-char hex string. Vercel has a "Generate" button, or run:
+     ```
+     node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+     ```
+5. Click **Deploy**.
+6. Visit your deployed URL. The first request triggers auto-migration — all six tables are created and the default admin user (`admin` / `admin123`) is seeded.
+7. Go to `/login`, sign in, and **change the password** from Admin → Account.
 
-## 2. Run the schema
-
-1. In your project, open **SQL Editor** in the left sidebar.
-2. Click **New query**.
-3. Open `supabase/migrations/001_init.sql` from this repo, copy the entire file, paste it into the query editor.
-4. Click **Run** (or press Ctrl+Enter).
-
-You should see a success message. This creates six tables: `settings`, `sections`, `nav`, `footer`, `enquiries`, `admin`, and seeds the default admin user (`admin` / `admin123`).
-
-## 3. Grab your credentials
-
-1. Open **Project Settings → API** in the left sidebar.
-2. Copy these two values:
-   - **Project URL** → this is your `SUPABASE_URL`
-   - **`service_role` secret** (under Project API keys) → this is your `SUPABASE_SERVICE_ROLE_KEY`
-
-> ⚠️ The `service_role` key **bypasses Row-Level Security**. Never expose it to a browser or commit it to git. It only lives in server-side env vars.
-
-## 4. Configure your environment
-
-### Local
-
-Create `.env.local` in the project root (this file is gitignored):
-
-```
-SUPABASE_URL=https://xxxxxxxxxxx.supabase.co
-SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOi...long-string...
-AUTH_SECRET=<paste a random 64-char hex string here>
-```
-
-Generate a random `AUTH_SECRET`:
-
-```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-```
-
-Restart the dev server (`npm run dev`). It'll now read/write Supabase instead of local JSON files.
-
-### Vercel
-
-1. In your Vercel project, open **Settings → Environment Variables**.
-2. Add three variables (available to Production, Preview, and Development):
-   - `SUPABASE_URL`
-   - `SUPABASE_SERVICE_ROLE_KEY`
-   - `AUTH_SECRET`
-3. Redeploy.
-
-## 5. Change the admin password
-
-Log in at `/login` with `admin` / `admin123`, then go to **Account** in the sidebar and set a new password. The old one is immediately overwritten in Supabase.
-
-## 6. (Optional) Migrate existing data
-
-If you have data in `./data/*.json` you want to keep:
-
-```bash
-# From the project root
-node -e "
-const fs = require('fs');
-const path = 'data/enquiries.json';
-if (fs.existsSync(path)) {
-  const rows = JSON.parse(fs.readFileSync(path,'utf8'));
-  console.log(rows.length + ' enquiries — paste this into a Supabase SQL Editor:');
-  console.log('insert into enquiries (id,name,email,phone,program,capital,message,source,status,created_at) values');
-  console.log(rows.map(r => \`('\${r.id}',\$\$\${r.name}\$\$,\$\$\${r.email}\$\$,\$\$\${r.phone||''}\$\$,\$\$\${r.program||''}\$\$,\$\$\${r.capital||''}\$\$,\$\$\${r.message||''}\$\$,'\${r.source}','\${r.status}','\${r.createdAt}')\`).join(',\\n') + ';');
-}
-"
-```
-
-Copy the output, paste into Supabase SQL Editor, run.
-
-For settings/sections/nav/footer: just edit them from the admin UI after logging in — much easier than migrating JSON.
+That's it. No SQL editor. No `supabase link`. No CLI.
 
 ---
 
-## Verify it's working
+## Alternative: standalone Supabase project (no Vercel integration)
 
-After configuring env vars and restarting, hit any admin page — the top of `layout.tsx` calls `getSettings()`. If it renders, Supabase is wired. If you see an error, check:
+If you're hosting somewhere else, or you already have a Supabase project you want to reuse:
 
-- Correct `SUPABASE_URL` (with `https://` and no trailing slash)
-- Correct `SUPABASE_SERVICE_ROLE_KEY` (starts with `eyJ`, not the anon key)
-- SQL migration ran successfully (check the `admin` table has one row in Supabase → Table Editor)
+1. Create the project at [supabase.com](https://supabase.com) if you don't have one.
+2. Grab three values from **Project Settings → API** and **Database**:
+   - `SUPABASE_URL` (Project URL)
+   - `SUPABASE_SERVICE_ROLE_KEY` (service_role secret — server-side only)
+   - `POSTGRES_URL_NON_POOLING` (Connection string → URI, direct connection). Any of `POSTGRES_URL` / `DATABASE_URL` works too.
+3. Set those + `AUTH_SECRET` on your host.
+4. Deploy and hit any page — the auto-migrator runs the schema for you.
+
+If for some reason you'd rather run the SQL by hand (auditability, custom RLS policies, etc.), the same file the migrator uses is at [`supabase/migrations/001_init.sql`](supabase/migrations/001_init.sql) — paste it into Supabase SQL Editor and run. The migrator will detect the tables already exist and skip.
+
+---
+
+## Local development
+
+Just:
+```
+npm install
+npm run dev
+```
+
+If you don't set any Supabase env vars, the app falls back to local JSON files under `./data/` (gitignored). Great for local iteration.
+
+To test against your real Supabase from local, copy `.env.example` to `.env.local` and fill it in.
+
+---
+
+## How the auto-migrator works
+
+- On the first request that hits the Supabase backend, [`lib/db-migrate.ts`](lib/db-migrate.ts) opens a direct Postgres connection using `POSTGRES_URL_NON_POOLING` (or `POSTGRES_URL` / `DATABASE_URL` as fallbacks).
+- It runs `select exists (…) from information_schema.tables where table_name='enquiries'`. If true, migration is skipped.
+- Otherwise it executes the entire `001_init.sql` file as one transaction: creates all six tables, seeds the default admin user, enables RLS.
+- The success is cached in-process, so subsequent requests are instant.
+- If a migration ever fails, the flag is reset and the next request retries.
+
+The migration is idempotent (`create table if not exists`, `on conflict do nothing` on seeds) — safe to re-run at any time.
+
+---
+
+## Storage limitations
+
+**Logo uploads** currently write to `/public/uploads/logo/` on the local filesystem. On Vercel's serverless runtime that path is read-only, so uploaded logos won't persist between deployments. Two paths forward when you're ready:
+
+- **Quick fix**: bundle the logo you want as `public/logo.jpg` (already done — that's why the site has a default logo on first deploy).
+- **Proper fix**: swap the `/api/upload/logo` route to use Supabase Storage. Create a public bucket named `logos`, then replace the local `fs.writeFileSync` with `sb.storage.from('logos').upload(...)`. All other admin features (enquiries, settings, sections, nav, footer) work on Vercel unchanged with Supabase.
+
+---
 
 ## Troubleshooting
 
-**Error: "relation public.settings does not exist"** — the SQL migration didn't run. Re-run `001_init.sql`.
+**Auto-migration doesn't run?** Check server logs for `[db-migrate]` messages. If you see `No POSTGRES_URL … env var found`, the Vercel-Supabase integration didn't complete — reconnect it from Vercel Storage, or manually add `POSTGRES_URL_NON_POOLING` from your Supabase project.
 
-**Login fails immediately** — the admin table wasn't seeded. In Supabase SQL Editor run:
+**Login fails immediately after first deploy?** The admin seed didn't insert. Check `admin` table in Supabase Table Editor — should have one row with `username='admin'`. If empty, run this in SQL Editor:
 ```sql
 insert into public.admin (id, username, password_hash) values
   (1, 'admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9')
 on conflict (id) do update set username=excluded.username, password_hash=excluded.password_hash;
 ```
-
-**Logo upload doesn't persist on Vercel** — Vercel serverless has a read-only filesystem. Move logo uploads to Supabase Storage (create a bucket named `logos`, replace `/api/upload/logo` to use `sb().storage.from('logos').upload(...)`). This is a follow-up — the rest of the app works fine without it.
+Password: `admin123`.
