@@ -65,7 +65,7 @@ export default async function Home() {
       {visible("platform") && <Platform />}
       {visible("traders") && <Trader stats={settings.stats} />}
       {visible("testimonials") && <Voices />}
-      {visible("insights") && <Insights />}
+      {visible("insights") && <Insights content={sections.find((s) => s.key === "insights")?.content as never} />}
       {visible("faq") && <FAQ />}
       <Contact
         phoneDisplay={settings.contact.phoneDisplay}

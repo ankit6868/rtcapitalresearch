@@ -62,7 +62,30 @@ export const DEFAULT_SECTIONS: Section[] = [
   { id: "sec-platform", title: "Platform", key: "platform", order: 5, visible: true, content: { eyebrow: "THE PLATFORM", headline: "Professional Trading Platform." } },
   { id: "sec-traders", title: "Trader Programme", key: "traders", order: 6, visible: true, content: { eyebrow: "TRADER PROGRAMME", headline: "Become a Data-Driven professional trader." } },
   { id: "sec-testimonials", title: "Testimonials", key: "testimonials", order: 7, visible: true, content: { eyebrow: "CLIENT VOICES", headline: "Trusted by traders who already know better." } },
-  { id: "sec-insights", title: "Insights", key: "insights", order: 8, visible: false, content: { eyebrow: "FROM THE DESK", headline: "Insights, weekly." } },
+  {
+    id: "sec-insights",
+    title: "Insights",
+    key: "insights",
+    order: 8,
+    visible: true,
+    content: {
+      eyebrow: "FROM THE DESK",
+      headline: "Insights, weekly.",
+      allArticlesLabel: "All articles",
+      featured: {
+        category: "MARKET STRATEGY",
+        readTime: "14 MIN READ",
+        date: "MAY 12, 2026",
+        title: "Why the next leg of the Nifty rally lives or dies on bank earnings — a flow-based view.",
+        excerpt: "A deep dive into FII positioning, derivatives skew, and credit-cycle signals shaping our base case.",
+      },
+      side: [
+        { category: "OPTIONS",    date: "MAY 09", title: "Skew is screaming. What the BANKNIFTY vol surface is telling us.", byline: "7 min read · Aman Verma",  highlight: false },
+        { category: "PSYCHOLOGY", date: "MAY 05", title: "The 3pm trap: why most retail traders give back their gains.",    byline: "5 min read · Priya Nair",  highlight: true  },
+        { category: "MACRO",      date: "MAY 02", title: "Crude, the rupee, and the inflation print: setup into the May RBI meet.", byline: "9 min read · Rohan Mehra", highlight: false },
+      ],
+    },
+  },
   { id: "sec-faq", title: "FAQ", key: "faq", order: 9, visible: true, content: { eyebrow: "FREQUENTLY ASKED", headline: "Common Questions" } },
 ];
 
