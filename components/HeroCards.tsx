@@ -20,12 +20,15 @@ const SECTORS = [
 ];
 
 function colorFor(v: number) {
-  if (v >= 1.8) return { bg: "#5cd48a", fg: "#04321a" };
-  if (v >= 1.0) return { bg: "#8adba3", fg: "#04321a" };
-  if (v >= 0.3) return { bg: "#b5e6c5", fg: "#04321a" };
-  if (v >= 0)   return { bg: "#dff2e6", fg: "#0a5030" };
-  if (v >= -1)  return { bg: "#f4c8c8", fg: "#4a0d0d" };
-  return { bg: "#f0b6b6", fg: "#4a0d0d" };
+  // Positive (green scale — deeper = higher gain)
+  if (v >= 2.0)  return { bg: "#22c55e", fg: "#ffffff" };  // vivid green
+  if (v >= 1.0)  return { bg: "#4ade80", fg: "#0a2e17" };  // strong green
+  if (v >= 0.5)  return { bg: "#86efac", fg: "#0a2e17" };  // medium green
+  if (v >= 0)    return { bg: "#c7f2d5", fg: "#0a3a1e" };  // light green
+  // Negative (red scale — deeper = larger loss)
+  if (v >= -0.5) return { bg: "#fecaca", fg: "#5a0d0d" };  // light red
+  if (v >= -1.5) return { bg: "#fca5a5", fg: "#5a0d0d" };  // medium red
+  return          { bg: "#f87171", fg: "#ffffff" };         // vivid red
 }
 
 export default function HeroCards() {
