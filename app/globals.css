@@ -105,13 +105,14 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .pill{font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--muted);padding:5px 12px;border:1px solid var(--line);border-radius:6px;text-transform:uppercase}
 .pill.active{border-color:var(--ink);color:var(--ink)}
 
-.card-heat{top:380px;left:-20px;width:290px;padding:20px;z-index:3;animation:floatB 8s ease-in-out infinite;animation-delay:-1.5s}
+.card-heat{top:380px;left:-20px;width:290px;padding:20px;z-index:3;animation:floatB 8s ease-in-out infinite;animation-delay:-1.5s;overflow:hidden}
 .card-heat-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .card-heat-head .t{font-weight:600;font-size:14px;color:var(--ink)}
 .card-heat-head .time{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em}
-.heat-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:6px}
-.heat-cell{aspect-ratio:1.2/1;border-radius:9px;padding:9px;display:flex;flex-direction:column;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.08em;transition:background .4s ease,color .4s ease}
-.heat-cell b{font-weight:600;font-size:12px}
+.heat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.heat-cell{aspect-ratio:1.15/1;border-radius:8px;padding:8px 6px;display:flex;flex-direction:column;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.04em;transition:background .4s ease,color .4s ease;min-width:0;overflow:hidden}
+.heat-cell b{font-weight:600;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.heat-cell span{font-size:10px}
 
 .card-signal{top:440px;right:-20px;width:305px;padding:22px 24px 24px;z-index:4;animation:floatC 9s ease-in-out infinite;animation-delay:-3s}
 .card-signal-head{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:14px}
