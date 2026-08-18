@@ -136,14 +136,20 @@ async function runMigration(): Promise<void> {
   }
 }
 
-/** Call this at the top of every Supabase backend method. Runs once. */
+/** Call this at the top of every Supabase backend method. Runs once.
+ *  NEVER throws — if migration fails, logs the error and lets the caller
+ *  proceed. This way the app degrades gracefully: either the tables already
+ *  exist (previous manual run), or the individual query will fail with a
+ *  clearer error that the caller can handle. */
 export async function ensureMigrated(): Promise<void> {
   if (migrated) return;
   if (!migrationPromise) {
     migrationPromise = runMigration().catch((err) => {
-      console.error("[db-migrate] Migration failed:", err);
-      migrationPromise = null;
-      throw err;
+      console.error("[db-migrate] Migration failed (non-fatal):", err?.message || err);
+      // Mark done so we don't hammer the DB with retries every request.
+      // If the schema is missing, individual Supabase queries will error
+      // and be handled per-call.
+      migrated = true;
     });
   }
   await migrationPromise;

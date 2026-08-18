@@ -14,16 +14,38 @@ import Footer from "@/components/Footer";
 import WhatsAppFab from "@/components/WhatsAppFab";
 import PopupTrigger from "@/components/PopupTrigger";
 import { getSettings, getNav, getFooter, getSections } from "@/lib/db";
+import { DEFAULT_SETTINGS, DEFAULT_NAV, DEFAULT_FOOTER, DEFAULT_SECTIONS } from "@/lib/defaults";
+import type { Settings, NavItem, FooterColumn, Section } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
+async function safeLoad(): Promise<{
+  settings: Settings;
+  nav: NavItem[];
+  footerCols: FooterColumn[];
+  sections: Section[];
+}> {
+  try {
+    const [settings, nav, footerCols, sections] = await Promise.all([
+      getSettings().catch((e) => { console.error("[home] getSettings:", e?.message || e); return DEFAULT_SETTINGS; }),
+      getNav().catch((e) => { console.error("[home] getNav:", e?.message || e); return DEFAULT_NAV; }),
+      getFooter().catch((e) => { console.error("[home] getFooter:", e?.message || e); return DEFAULT_FOOTER; }),
+      getSections().catch((e) => { console.error("[home] getSections:", e?.message || e); return DEFAULT_SECTIONS; }),
+    ]);
+    return { settings, nav, footerCols, sections };
+  } catch (e) {
+    console.error("[home] Fatal load error, using all defaults:", (e as Error)?.message || e);
+    return {
+      settings: DEFAULT_SETTINGS,
+      nav: DEFAULT_NAV,
+      footerCols: DEFAULT_FOOTER,
+      sections: DEFAULT_SECTIONS,
+    };
+  }
+}
+
 export default async function Home() {
-  const [settings, navRaw, footerCols, sections] = await Promise.all([
-    getSettings(),
-    getNav(),
-    getFooter(),
-    getSections(),
-  ]);
+  const { settings, nav: navRaw, footerCols, sections } = await safeLoad();
   const nav = navRaw.filter((n) => n.visible);
   const visible = (key: string) => sections.find((s) => s.key === key)?.visible !== false;
 
