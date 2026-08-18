@@ -111,9 +111,16 @@ async function runMigration(): Promise<void> {
     return;
   }
 
+  // Strip sslmode query param — when present in the connection string it
+  // overrides the ssl option object, forcing strict cert verification which
+  // fails on Supabase's self-signed intermediate chain from Vercel serverless.
+  const cleanedConn = conn.replace(/([?&])sslmode=[^&]*(&|$)/g, (_, pre, post) =>
+    post === "&" ? pre : ""
+  ).replace(/\?$/, "");
+
   const client = new Client({
-    connectionString: conn,
-    ssl: { rejectUnauthorized: false },
+    connectionString: cleanedConn,
+    ssl: { rejectUnauthorized: false, require: true },
   });
 
   try {
