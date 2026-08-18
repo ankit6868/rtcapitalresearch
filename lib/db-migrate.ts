@@ -120,7 +120,7 @@ async function runMigration(): Promise<void> {
 
   const client = new Client({
     connectionString: cleanedConn,
-    ssl: { rejectUnauthorized: false, require: true },
+    ssl: { rejectUnauthorized: false },
   });
 
   try {
