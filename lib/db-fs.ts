@@ -6,28 +6,68 @@ import { DEFAULT_SETTINGS, DEFAULT_SECTIONS, DEFAULT_NAV, DEFAULT_FOOTER } from 
 
 const DATA_DIR = path.join(process.cwd(), "data");
 
-function ensureDir() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+// Read-only filesystems (Vercel serverless) get an in-memory fallback so the
+// site keeps working with defaults instead of crashing. Warned once so it's
+// visible in logs.
+const memStore = new Map<string, unknown>();
+let readOnlyWarned = false;
+
+function warnReadOnly(err: unknown) {
+  if (readOnlyWarned) return;
+  readOnlyWarned = true;
+  console.warn(
+    "[db-fs] Cannot write to ./data — filesystem is read-only (probably Vercel serverless). " +
+      "Falling back to in-memory defaults. Configure Supabase env vars to enable persistence:",
+    (err as Error)?.message
+  );
+}
+
+function ensureDir(): boolean {
+  try {
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+    return true;
+  } catch (err) {
+    warnReadOnly(err);
+    return false;
+  }
 }
 function file(name: string) {
   return path.join(DATA_DIR, name + ".json");
 }
 function read<T>(name: string, fallback: T): T {
-  ensureDir();
+  // Memory cache first (for read-only environments)
+  if (memStore.has(name)) return memStore.get(name) as T;
+
+  if (!ensureDir()) {
+    memStore.set(name, fallback);
+    return fallback;
+  }
   const p = file(name);
   if (!fs.existsSync(p)) {
-    fs.writeFileSync(p, JSON.stringify(fallback, null, 2), "utf8");
+    try {
+      fs.writeFileSync(p, JSON.stringify(fallback, null, 2), "utf8");
+    } catch (err) {
+      warnReadOnly(err);
+    }
+    memStore.set(name, fallback);
     return fallback;
   }
   try {
-    return JSON.parse(fs.readFileSync(p, "utf8")) as T;
+    const parsed = JSON.parse(fs.readFileSync(p, "utf8")) as T;
+    memStore.set(name, parsed);
+    return parsed;
   } catch {
     return fallback;
   }
 }
 function write<T>(name: string, data: T) {
-  ensureDir();
-  fs.writeFileSync(file(name), JSON.stringify(data, null, 2), "utf8");
+  memStore.set(name, data);
+  if (!ensureDir()) return;
+  try {
+    fs.writeFileSync(file(name), JSON.stringify(data, null, 2), "utf8");
+  } catch (err) {
+    warnReadOnly(err);
+  }
 }
 function sha256(s: string) {
   return crypto.createHash("sha256").update(s).digest("hex");

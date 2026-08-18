@@ -1,10 +1,89 @@
-import fs from "node:fs";
-import path from "node:path";
 import { Client } from "pg";
 
 // Runs the init migration ONCE per process cold start.
 // Uses the direct Postgres connection URL that the Vercel-Supabase
 // integration injects automatically. Idempotent (uses IF NOT EXISTS).
+//
+// The SQL is inlined (not read from disk) because Vercel's serverless
+// bundler doesn't include arbitrary files from the source tree — only
+// what's traceable through imports.
+
+const INIT_SQL = `
+-- ============ Settings (single row) ============
+create table if not exists public.settings (
+  id integer primary key default 1,
+  data jsonb not null,
+  updated_at timestamptz default now(),
+  constraint settings_singleton check (id = 1)
+);
+
+-- ============ Sections ============
+create table if not exists public.sections (
+  id text primary key,
+  title text not null,
+  key text not null unique,
+  "order" integer not null default 0,
+  visible boolean not null default true,
+  content jsonb not null default '{}'::jsonb,
+  updated_at timestamptz default now()
+);
+create index if not exists sections_order_idx on public.sections ("order");
+
+-- ============ Nav (single-row jsonb array for simplicity) ============
+create table if not exists public.nav (
+  id integer primary key default 1,
+  items jsonb not null default '[]'::jsonb,
+  updated_at timestamptz default now(),
+  constraint nav_singleton check (id = 1)
+);
+
+-- ============ Footer (single-row jsonb array) ============
+create table if not exists public.footer (
+  id integer primary key default 1,
+  columns jsonb not null default '[]'::jsonb,
+  updated_at timestamptz default now(),
+  constraint footer_singleton check (id = 1)
+);
+
+-- ============ Enquiries ============
+create table if not exists public.enquiries (
+  id uuid primary key default gen_random_uuid(),
+  name text not null,
+  email text not null,
+  phone text,
+  program text,
+  capital text,
+  message text,
+  source text not null default 'modal',
+  status text not null default 'new',
+  created_at timestamptz not null default now()
+);
+create index if not exists enquiries_created_at_idx on public.enquiries (created_at desc);
+create index if not exists enquiries_status_idx on public.enquiries (status);
+
+-- ============ Admin (single row) ============
+create table if not exists public.admin (
+  id integer primary key default 1,
+  username text not null,
+  password_hash text not null,
+  updated_at timestamptz default now(),
+  constraint admin_singleton check (id = 1)
+);
+
+-- Seed default admin: username=admin, password=admin123
+-- sha256('admin123') = 240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
+insert into public.admin (id, username, password_hash)
+values (1, 'admin', '240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9')
+on conflict (id) do nothing;
+
+-- ============ Row-Level Security ============
+alter table public.settings   enable row level security;
+alter table public.sections   enable row level security;
+alter table public.nav        enable row level security;
+alter table public.footer     enable row level security;
+alter table public.enquiries  enable row level security;
+alter table public.admin      enable row level security;
+`;
 
 let migrationPromise: Promise<void> | null = null;
 let migrated = false;
@@ -21,26 +100,19 @@ function pickConnectionString(): string | null {
 async function runMigration(): Promise<void> {
   const conn = pickConnectionString();
   if (!conn) {
-    // No Postgres URL available — we're either on fs backend or user needs to run SQL manually.
     console.warn(
       "[db-migrate] No POSTGRES_URL / DATABASE_URL env var found. " +
-        "If you're using Supabase, either connect via Vercel-Supabase integration " +
-        "(which auto-injects POSTGRES_URL), or run supabase/migrations/001_init.sql manually in the SQL editor."
+        "Skipping auto-migration. Either connect Supabase via Vercel integration " +
+        "or run supabase/migrations/001_init.sql manually in the Supabase SQL editor."
     );
+    // Mark as done so we don't retry every request when the env is intentionally
+    // missing (e.g. someone using their own already-migrated database).
+    migrated = true;
     return;
   }
-
-  const sqlPath = path.join(process.cwd(), "supabase", "migrations", "001_init.sql");
-  if (!fs.existsSync(sqlPath)) {
-    console.warn("[db-migrate] Migration file not found at", sqlPath);
-    return;
-  }
-  const sql = fs.readFileSync(sqlPath, "utf8");
 
   const client = new Client({
     connectionString: conn,
-    // Supabase requires TLS. Vercel-injected URLs already include ?sslmode=require,
-    // but be explicit for safety.
     ssl: { rejectUnauthorized: false },
   });
 
@@ -56,7 +128,7 @@ async function runMigration(): Promise<void> {
       return;
     }
     console.log("[db-migrate] Running initial schema migration...");
-    await client.query(sql);
+    await client.query(INIT_SQL);
     console.log("[db-migrate] Migration complete.");
     migrated = true;
   } finally {
@@ -70,7 +142,6 @@ export async function ensureMigrated(): Promise<void> {
   if (!migrationPromise) {
     migrationPromise = runMigration().catch((err) => {
       console.error("[db-migrate] Migration failed:", err);
-      // Reset so the next request can retry.
       migrationPromise = null;
       throw err;
     });
