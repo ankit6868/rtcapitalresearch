@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-const W = 500, H = 170, PAD_L = 10, PAD_R = 10, PAD_T = 20, PAD_B = 40;
+const W = 500, H = 220, PAD_L = 10, PAD_R = 10, PAD_T = 20, PAD_B = 40;
 const BASE = 24227.14;
 const N = 40;
 

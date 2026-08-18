@@ -81,7 +81,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .hero-cta{display:flex;gap:12px;flex-wrap:wrap}
 
 /* HERO CARDS */
-.hero-cards{position:relative;height:660px}
+.hero-cards{position:relative;height:680px}
 .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius-lg);box-shadow:var(--shadow);position:absolute;will-change:transform}
 
 @keyframes floatA{0%,100%{transform:translateY(0) rotate(0deg)}50%{transform:translateY(-10px) rotate(.15deg)}}
@@ -92,11 +92,11 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 @keyframes modalIn{0%{opacity:0;transform:translateY(12px) scale(.98)}100%{opacity:1;transform:translateY(0) scale(1)}}
 @keyframes backdropIn{0%{opacity:0}100%{opacity:1}}
 
-.card-chart{top:0;left:0;right:-10px;padding:26px 28px;z-index:2;animation:floatA 7s ease-in-out infinite}
+.card-chart{top:0;left:0;right:-20px;padding:28px 30px 24px;z-index:2;animation:floatA 7s ease-in-out infinite}
 .card-chart-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
 .card-chart-title{font-family:var(--mono);font-size:11px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;display:flex;align-items:center;gap:10px}
 .tag-live{background:var(--green-soft);color:var(--green);font-family:var(--mono);font-size:10px;padding:3px 8px;border-radius:5px;font-weight:600;letter-spacing:.1em;animation:greenPulse 2.5s ease-in-out infinite}
-.card-chart .price{font-family:var(--serif);font-weight:500;font-size:44px;letter-spacing:-.02em;color:var(--ink);transition:color .3s ease;line-height:1.1}
+.card-chart .price{font-family:var(--serif);font-weight:500;font-size:48px;letter-spacing:-.02em;color:var(--ink);transition:color .3s ease;line-height:1.1}
 .card-chart .price.flash{color:var(--blue)}
 .card-chart .change{text-align:right;color:var(--green);font-family:var(--mono);font-size:13px;line-height:1.6;transition:color .3s ease}
 .card-chart .change b{font-weight:500;font-size:14px}
@@ -105,7 +105,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .pill{font-family:var(--mono);font-size:10px;letter-spacing:.15em;color:var(--muted);padding:5px 12px;border:1px solid var(--line);border-radius:6px;text-transform:uppercase}
 .pill.active{border-color:var(--ink);color:var(--ink)}
 
-.card-heat{top:380px;left:-20px;width:290px;padding:20px;z-index:3;animation:floatB 8s ease-in-out infinite;animation-delay:-1.5s}
+.card-heat{top:410px;left:-20px;width:290px;padding:20px;z-index:3;animation:floatB 8s ease-in-out infinite;animation-delay:-1.5s}
 .card-heat-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
 .card-heat-head .t{font-weight:600;font-size:14px;color:var(--ink)}
 .card-heat-head .time{font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:.1em}
@@ -113,7 +113,7 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .heat-cell{aspect-ratio:1.2/1;border-radius:9px;padding:9px;display:flex;flex-direction:column;justify-content:space-between;font-family:var(--mono);font-size:11px;letter-spacing:.08em;transition:background .4s ease,color .4s ease}
 .heat-cell b{font-weight:600;font-size:12px}
 
-.card-signal{top:440px;right:-20px;width:305px;padding:22px 24px 24px;z-index:4;animation:floatC 9s ease-in-out infinite;animation-delay:-3s}
+.card-signal{top:470px;right:-20px;width:305px;padding:22px 24px 24px;z-index:4;animation:floatC 9s ease-in-out infinite;animation-delay:-3s}
 .card-signal-head{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:14px}
 .card-signal-head .dot{width:7px;height:7px;background:var(--blue);border-radius:50%;animation:pulseDot 2s ease-out infinite}
 .signal-ticker{font-family:var(--serif);font-weight:600;font-size:26px;letter-spacing:-.01em;margin-bottom:4px;transition:opacity .35s,transform .35s}
