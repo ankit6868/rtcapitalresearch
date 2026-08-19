@@ -18,6 +18,8 @@ import { DEFAULT_SETTINGS, DEFAULT_NAV, DEFAULT_FOOTER, DEFAULT_SECTIONS } from 
 import type { Settings, NavItem, FooterColumn, Section } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
+export const revalidate = 0;
+export const fetchCache = "force-no-store";
 
 async function safeLoad(): Promise<{
   settings: Settings;
@@ -25,29 +27,25 @@ async function safeLoad(): Promise<{
   footerCols: FooterColumn[];
   sections: Section[];
 }> {
-  try {
-    const [settings, nav, footerCols, sections] = await Promise.all([
-      getSettings().catch((e) => { console.error("[home] getSettings:", e?.message || e); return DEFAULT_SETTINGS; }),
-      getNav().catch((e) => { console.error("[home] getNav:", e?.message || e); return DEFAULT_NAV; }),
-      getFooter().catch((e) => { console.error("[home] getFooter:", e?.message || e); return DEFAULT_FOOTER; }),
-      getSections().catch((e) => { console.error("[home] getSections:", e?.message || e); return DEFAULT_SECTIONS; }),
-    ]);
-    return { settings, nav, footerCols, sections };
-  } catch (e) {
-    console.error("[home] Fatal load error, using all defaults:", (e as Error)?.message || e);
-    return {
-      settings: DEFAULT_SETTINGS,
-      nav: DEFAULT_NAV,
-      footerCols: DEFAULT_FOOTER,
-      sections: DEFAULT_SECTIONS,
-    };
-  }
+  const [settings, nav, footerCols, sections] = await Promise.all([
+    getSettings().catch((e) => { console.error("[home] getSettings:", e?.message || e); return DEFAULT_SETTINGS; }),
+    getNav().catch((e) => { console.error("[home] getNav:", e?.message || e); return DEFAULT_NAV; }),
+    getFooter().catch((e) => { console.error("[home] getFooter:", e?.message || e); return DEFAULT_FOOTER; }),
+    getSections().catch((e) => { console.error("[home] getSections:", e?.message || e); return DEFAULT_SECTIONS; }),
+  ]);
+  return { settings, nav, footerCols, sections };
+}
+
+function sectionContent(sections: Section[], key: string): Record<string, unknown> {
+  return (sections.find((s) => s.key === key)?.content as Record<string, unknown>) || {};
+}
+function isVisible(sections: Section[], key: string): boolean {
+  return sections.find((s) => s.key === key)?.visible !== false;
 }
 
 export default async function Home() {
   const { settings, nav: navRaw, footerCols, sections } = await safeLoad();
   const nav = navRaw.filter((n) => n.visible);
-  const visible = (key: string) => sections.find((s) => s.key === key)?.visible !== false;
 
   return (
     <>
@@ -58,15 +56,15 @@ export default async function Home() {
         logoFallback={settings.logoFallback}
       />
       <Hero hero={settings.hero} />
-      {visible("about") && <Firm />}
-      {visible("services") && <Services />}
-      {visible("markets") && <Global />}
-      {visible("programs") && <LHT />}
-      {visible("platform") && <Platform />}
-      {visible("traders") && <Trader stats={settings.stats} />}
-      {visible("testimonials") && <Voices />}
-      {visible("insights") && <Insights content={sections.find((s) => s.key === "insights")?.content as never} />}
-      {visible("faq") && <FAQ />}
+      {isVisible(sections, "about")        && <Firm     content={sectionContent(sections, "about")} />}
+      {isVisible(sections, "services")     && <Services content={sectionContent(sections, "services")} />}
+      {isVisible(sections, "markets")      && <Global   content={sectionContent(sections, "markets")} />}
+      {isVisible(sections, "programs")     && <LHT      content={sectionContent(sections, "programs")} />}
+      {isVisible(sections, "platform")     && <Platform content={sectionContent(sections, "platform")} />}
+      {isVisible(sections, "traders")      && <Trader   stats={settings.stats} content={sectionContent(sections, "traders")} />}
+      {isVisible(sections, "testimonials") && <Voices   content={sectionContent(sections, "testimonials")} />}
+      {isVisible(sections, "insights")     && <Insights content={sectionContent(sections, "insights")} />}
+      {isVisible(sections, "faq")          && <FAQ      content={sectionContent(sections, "faq")} />}
       <Contact
         phoneDisplay={settings.contact.phoneDisplay}
         email={settings.contact.email}

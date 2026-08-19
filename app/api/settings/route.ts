@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getSettings, saveSettings } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
@@ -13,5 +14,6 @@ export async function POST(req: NextRequest) {
   if (!getSession()) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const body = await req.json();
   await saveSettings(body);
+  revalidatePath("/", "layout");
   return NextResponse.json({ ok: true });
 }

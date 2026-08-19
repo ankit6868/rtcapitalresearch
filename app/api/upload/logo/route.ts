@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import fs from "node:fs";
 import path from "node:path";
 import { getSession } from "@/lib/auth";
@@ -26,6 +27,7 @@ export async function POST(req: NextRequest) {
   const publicPath = `/uploads/logo/${filename}`;
   const s = await getSettings();
   await saveSettings({ ...s, logoPath: publicPath });
+  revalidatePath("/", "layout");
   return NextResponse.json({ ok: true, path: publicPath });
 }
 
@@ -33,5 +35,6 @@ export async function DELETE() {
   if (!getSession()) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   const s = await getSettings();
   await saveSettings({ ...s, logoPath: null });
+  revalidatePath("/", "layout");
   return NextResponse.json({ ok: true });
 }

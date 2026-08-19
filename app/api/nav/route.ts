@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { getNav, saveNav } from "@/lib/db";
 import { getSession } from "@/lib/auth";
 
@@ -14,5 +15,6 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   if (!Array.isArray(body.nav)) return NextResponse.json({ error: "invalid" }, { status: 400 });
   await saveNav(body.nav);
+  revalidatePath("/", "layout");
   return NextResponse.json({ ok: true });
 }
