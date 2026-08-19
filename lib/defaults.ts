@@ -22,6 +22,7 @@ export const DEFAULT_SETTINGS: Settings = {
   contact: {
     phoneDisplay: "+91  8003051188",
     whatsappDigits: "918003051188",
+    whatsappUrl: "https://wa.link/kw5nmi",
     email: "info@rtcapitalresarch.com",
     deskPhone: "+91  8003051188",
     mumbaiAddress: "",

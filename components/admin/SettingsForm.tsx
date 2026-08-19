@@ -117,6 +117,14 @@ export default function SettingsForm({ initial }: { initial: Settings }) {
           <div className="a-field"><label>EMAIL</label><input value={s.contact.email} onChange={(e) => setContact("email", e.target.value)} /></div>
           <div className="a-field"><label>DESK PHONE</label><input value={s.contact.deskPhone} onChange={(e) => setContact("deskPhone", e.target.value)} /></div>
         </div>
+        <div className="a-field" style={{ marginTop: 16 }}>
+          <label>WHATSAPP LINK URL (opens when the green button is clicked)</label>
+          <input
+            value={s.contact.whatsappUrl || ""}
+            placeholder="https://wa.link/xxxxxx  or  https://wa.me/919XXXXXXXXX"
+            onChange={(e) => setContact("whatsappUrl", e.target.value)}
+          />
+        </div>
         <div className="a-field" style={{ marginTop: 16 }}><label>MUMBAI ADDRESS</label><textarea rows={2} value={s.contact.mumbaiAddress} onChange={(e) => setContact("mumbaiAddress", e.target.value)} /></div>
         <div className="a-field" style={{ marginTop: 16 }}><label>UDAIPUR ADDRESS</label><textarea rows={2} value={s.contact.udaipurAddress} onChange={(e) => setContact("udaipurAddress", e.target.value)} /></div>
       </div>

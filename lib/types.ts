@@ -27,6 +27,7 @@ export type Settings = {
   contact: {
     phoneDisplay: string;
     whatsappDigits: string;
+    whatsappUrl?: string;
     email: string;
     deskPhone: string;
     mumbaiAddress: string;

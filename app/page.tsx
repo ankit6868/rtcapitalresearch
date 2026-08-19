@@ -78,7 +78,7 @@ export default async function Home() {
         copyright={settings.footerText.copyright}
         disclaimer={settings.footerText.disclaimer}
       />
-      <WhatsAppFab />
+      <WhatsAppFab href={settings.contact.whatsappUrl || "https://wa.link/kw5nmi"} />
       <PopupTrigger enabled={settings.popup.enabled} delayMs={settings.popup.delayMs} />
     </>
   );
