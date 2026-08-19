@@ -53,6 +53,29 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .nav-links a:hover{color:var(--blue)}
 .nav-cta{display:flex;gap:10px;align-items:center}
 
+/* Hamburger */
+.nav-burger{display:none;width:38px;height:38px;flex-direction:column;justify-content:center;align-items:center;gap:5px;border-radius:8px;background:transparent;border:1px solid var(--line-2);cursor:pointer;padding:0;transition:.15s}
+.nav-burger:hover{background:var(--bg-alt)}
+.nav-burger span{display:block;width:18px;height:2px;background:var(--ink);border-radius:1px;transition:transform .2s,opacity .2s}
+.nav-burger[aria-expanded="true"] span:nth-child(1){transform:translateY(7px) rotate(45deg)}
+.nav-burger[aria-expanded="true"] span:nth-child(2){opacity:0}
+.nav-burger[aria-expanded="true"] span:nth-child(3){transform:translateY(-7px) rotate(-45deg)}
+
+/* Drawer */
+.nav-drawer{position:fixed;inset:0;background:rgba(10,14,26,.5);backdrop-filter:blur(4px);z-index:100;opacity:0;pointer-events:none;transition:opacity .2s ease}
+.nav-drawer.open{opacity:1;pointer-events:auto}
+.nav-drawer-panel{position:absolute;top:0;right:0;bottom:0;width:min(88vw,340px);background:#fff;padding:22px 22px 26px;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .28s cubic-bezier(.32,.72,0,1);box-shadow:-8px 0 40px rgba(0,0,0,.15)}
+.nav-drawer.open .nav-drawer-panel{transform:translateX(0)}
+.nav-drawer-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:12px}
+.nav-drawer-head b{font-family:var(--serif);font-weight:600;font-size:18px}
+.nav-drawer-close{width:34px;height:34px;border-radius:8px;background:var(--bg-alt);color:var(--ink);font-size:22px;line-height:1;display:flex;align-items:center;justify-content:center;border:0;cursor:pointer}
+.nav-drawer-close:hover{background:var(--line)}
+.nav-drawer-links{flex:1;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-drawer-links a{padding:14px 12px;border-radius:10px;font-size:16px;font-weight:500;color:var(--ink-2);text-decoration:none;transition:background .15s,color .15s;cursor:pointer}
+.nav-drawer-links a:hover{background:var(--bg-alt);color:var(--blue)}
+.nav-drawer-cta{display:flex;flex-direction:column;gap:10px;padding-top:16px;border-top:1px solid var(--line)}
+.nav-drawer-cta .btn{width:100%;justify-content:center;padding:12px 20px}
+
 .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;font-weight:500;font-size:14px;transition:.2s ease;white-space:nowrap;font-family:inherit}
 .btn-ghost{background:#fff;border:1px solid var(--line-2);color:var(--ink)}
 .btn-ghost:hover{border-color:var(--ink);background:#fff}
@@ -369,27 +392,189 @@ button{font:inherit;cursor:pointer;border:0;background:none;color:inherit}
 .modal .send-full{width:100%;justify-content:center;margin-top:6px;padding:14px 20px}
 .req::after{content:" *";color:var(--blue)}
 
-/* RESPONSIVE */
-@media (max-width:1080px){
-  .hero-grid,.firm-grid,.what-head,.platform-head,.trader-top,.insights-grid,.faq-grid,.contact-grid{grid-template-columns:1fr;gap:50px}
-  .hero h1,.firm h2,.what-head h2,.global-head h2,.lht-head h2,.platform-head h2,.trader h2,.voices-head h2,.insights-head h2,.faq-side h2,.contact h2{font-size:48px}
-  .hero-cards{height:auto;position:relative}
-  .card{position:relative;margin-bottom:20px}
-  .card-chart,.card-heat,.card-signal{top:auto;bottom:auto;left:auto;right:auto;width:100%}
-  .what-grid,.global-grid,.lht-grid,.platform-grid,.voices-grid,.trader-cards{grid-template-columns:1fr 1fr}
-  .foot-grid{grid-template-columns:1fr 1fr}
-  .nav-links{display:none}
+/* ============================================================
+   RESPONSIVE — mobile-first breakpoints
+   Phone:   <= 640px  (single column, minimal padding, small type)
+   Tablet:  641-1024px (2 col grids, mid type)
+   Desktop: >= 1025px  (full layout, big type)
+   ============================================================ */
+
+/* ---------- TABLET (<= 1024px) ---------- */
+@media (max-width:1024px){
+  .container{padding:0 28px}
+
+  /* Hero */
+  .hero{padding:56px 0 72px}
+  .hero-grid,.firm-grid,.what-head,.platform-head,.trader-top,.insights-grid,.faq-grid,.contact-grid{grid-template-columns:1fr;gap:44px}
+  .hero h1{font-size:56px;margin:24px 0 26px}
+  .hero p.lede{max-width:none;font-size:15px}
+  .hero-cards{height:auto;position:relative;margin-top:20px}
+  .hero-cards .card{position:relative;margin-bottom:20px;animation:none}
+  .card-chart,.card-heat,.card-signal{top:auto;bottom:auto;left:auto;right:auto;width:100%;max-width:none}
+  .card-chart{padding:24px 22px}
+  .card-chart .price{font-size:40px}
+
+  /* Section headings */
+  .firm h2,.what-head h2,.global-head h2,.lht-head h2,.platform-head h2,.trader h2,.voices-head h2,.insights-head h2,.faq-side h2,.contact h2{font-size:44px}
+
+  /* Section padding */
+  .firm,.what,.global,.lht,.platform,.trader,.voices,.insights,.faq,.contact{padding:72px 0}
+
+  /* Grids collapse to 2 cols */
+  .what-grid,.global-grid,.lht-grid,.platform-grid,.voices-grid,.trader-cards{grid-template-columns:1fr 1fr;gap:16px}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:32px 28px}
   .stats{grid-template-columns:1fr 1fr}
-}
-@media (max-width:680px){
-  .container{padding:0 22px}
-  .hero{padding:40px 0 60px}
-  .hero h1,.firm h2,.what-head h2,.global-head h2,.lht-head h2,.platform-head h2,.trader h2,.voices-head h2,.insights-head h2,.faq-side h2,.contact h2{font-size:38px}
-  .what-grid,.global-grid,.lht-grid,.platform-grid,.voices-grid,.trader-cards,.foot-grid,.form-grid,.contact-row{grid-template-columns:1fr}
-  .stats{grid-template-columns:1fr}
+
+  /* Nav: hide inline links, show burger */
+  .nav-links{display:none}
+  .nav-burger{display:inline-flex}
+
+  /* Trader */
+  .trader-cards{grid-template-columns:1fr;gap:20px}
+
+  /* Insights head stacks */
   .insights-head{flex-direction:column;align-items:flex-start;gap:20px}
-  .feature .hero-img{height:280px}
-  .coverage-marks{gap:24px}
-  .coverage-marks span{font-size:24px}
-  .modal{padding:28px 24px}
+
+  /* Contact form padding */
+  .form-card{padding:32px 28px 28px}
+
+  /* Coverage marks */
+  .coverage{padding:40px 0 72px}
+  .coverage-marks{gap:32px}
+  .coverage-marks span{font-size:26px}
 }
+
+/* ---------- PHONE (<= 640px) ---------- */
+@media (max-width:640px){
+  .container{padding:0 18px}
+
+  /* NAV — hide Client Login on very small screens, keep Book a Call */
+  .nav-inner{height:64px}
+  .logo-mark{width:34px;height:34px;font-size:18px}
+  .logo-text b{font-size:15px}
+  .logo-text span{font-size:9px}
+  .nav-cta .btn-ghost{display:none}
+  .nav-cta .btn-dark{display:none}
+  .btn{padding:10px 16px;font-size:13px}
+
+  /* HERO */
+  .hero{padding:36px 0 48px}
+  .hero h1{font-size:38px;margin:20px 0 22px;letter-spacing:-.02em;line-height:1.05}
+  .hero p.lede{font-size:14.5px;line-height:1.6;margin-bottom:28px}
+  .hero-cta{gap:10px}
+  .badge{font-size:10px;padding:7px 14px;letter-spacing:.14em}
+
+  /* HERO cards — stacked, full width */
+  .hero-cards{margin-top:24px}
+  .hero-cards .card{margin-bottom:16px}
+  .card-chart{padding:20px 20px 18px}
+  .card-chart .price{font-size:34px}
+  .card-chart .change{font-size:12px}
+  .card-chart .change b{font-size:13px}
+  .card-heat{padding:16px}
+  .card-heat-head .t{font-size:13px}
+  .heat-cell{padding:7px 6px;font-size:10px}
+  .heat-cell b{font-size:11px}
+  .card-signal{padding:20px 20px 20px}
+  .signal-ticker{font-size:22px}
+  .signal-nums .col b{font-size:16px}
+
+  /* Coverage */
+  .coverage{padding:32px 0 52px}
+  .coverage-marks{gap:20px 24px}
+  .coverage-marks span{font-size:22px}
+
+  /* Sections */
+  .firm,.what,.global,.lht,.platform,.trader,.voices,.insights,.faq,.contact{padding:56px 0}
+  .firm h2,.what-head h2,.global-head h2,.lht-head h2,.platform-head h2,.trader h2,.voices-head h2,.insights-head h2,.faq-side h2,.contact h2{font-size:32px;line-height:1.1;margin:16px 0 22px}
+
+  /* Grids: single column */
+  .what-grid,.global-grid,.lht-grid,.platform-grid,.voices-grid,.trader-cards,.foot-grid,.form-grid,.contact-row{grid-template-columns:1fr;gap:14px}
+  .stats{grid-template-columns:1fr 1fr;gap:12px}
+
+  /* Firm */
+  .firm-list{gap:32px}
+  .firm-item h3{font-size:20px}
+  .firm-item p{font-size:14px}
+  .firm .lede{font-size:14.5px;max-width:none}
+
+  /* Services / Platform / Global / LHT cards */
+  .wcard,.plcard,.pcard,.gcard{padding:24px 22px;min-height:auto}
+  .wcard-head{margin-bottom:32px}
+  .wcard h3,.plcard h3,.pcard h3,.gcard h3{font-size:19px}
+
+  /* Trader (dark section) */
+  .trader-top{gap:32px}
+  .trader p.lede{font-size:14.5px;margin-bottom:28px;max-width:none}
+  .stat{padding:18px 18px 16px}
+  .stat b{font-size:32px;margin-bottom:8px}
+  .stat span{font-size:12.5px}
+  .tcard{padding:24px 22px}
+  .tcard h3{font-size:22px}
+
+  /* Voices */
+  .voices{padding:56px 0 72px}
+  .vcard{padding:24px 22px 22px;min-height:auto}
+  .vcard blockquote{font-size:14px}
+  .vperson b{font-size:13px}
+  .vperson span{font-size:11px}
+
+  /* Insights */
+  .feature .hero-img{height:220px;margin-bottom:16px}
+  .feature h3{font-size:24px;line-height:1.2}
+  .feature p{font-size:14px}
+  .sart h4{font-size:17px;line-height:1.3}
+  .sart-meta,.feature-meta{font-size:10px;letter-spacing:.14em}
+
+  /* FAQ */
+  .faq-side h2{margin-bottom:22px}
+  .faq-q{padding:20px 0;font-size:16px;line-height:1.35;gap:12px}
+  .faq-q .ico{font-size:20px;flex-shrink:0}
+  .faq-a-inner{padding:0 0 22px;font-size:14px}
+
+  /* Contact */
+  .contact-side .lede{font-size:14.5px;max-width:none;margin-bottom:28px}
+  .contact-block .addr{font-size:14px;max-width:none}
+  .contact-row{gap:18px;padding-top:16px;margin-top:16px}
+  .form-card{padding:22px 20px 20px}
+  .form-card h3{font-size:22px}
+  .form-card .sub{font-size:13px;margin-bottom:20px}
+  .field input,.field select,.field textarea{font-size:14px;padding:11px 13px}
+  .chip{padding:7px 12px;font-size:12.5px}
+  .form-foot{flex-direction:column;align-items:stretch;gap:12px}
+  .form-foot .btn{justify-content:center}
+
+  /* Footer */
+  .foot{padding:56px 0 32px}
+  .foot-grid{padding-bottom:40px;gap:32px}
+  .foot-brand p{max-width:none;font-size:13px}
+  .sub-form{max-width:340px}
+  .foot-bottom{flex-direction:column;align-items:flex-start;gap:16px;font-size:12px}
+  .foot-bottom .links{gap:20px;flex-wrap:wrap}
+  .disclaimer{font-size:11.5px;padding:22px 0}
+
+  /* Modal */
+  .modal{padding:26px 22px 22px;border-radius:16px}
+  .modal h3{font-size:22px}
+  .modal .m-sub{font-size:13px;margin-bottom:18px}
+  .modal .form-grid{grid-template-columns:1fr}
+
+  /* WhatsApp FAB */
+  .wa-fab{bottom:18px;right:18px;width:52px;height:52px}
+  .wa-fab svg{width:26px;height:26px}
+}
+
+/* ---------- Very small phones (<= 380px) ---------- */
+@media (max-width:380px){
+  .container{padding:0 14px}
+  .hero h1{font-size:34px}
+  .firm h2,.what-head h2,.global-head h2,.lht-head h2,.platform-head h2,.trader h2,.voices-head h2,.insights-head h2,.faq-side h2,.contact h2{font-size:28px}
+  .card-chart .price{font-size:30px}
+  .stats{grid-template-columns:1fr}
+  .logo-text b{font-size:14px}
+  .nav-cta .btn-dark{padding:9px 14px;font-size:12.5px}
+  .coverage-marks span{font-size:20px}
+}
+
+/* ---------- Prevent horizontal scroll globally ---------- */
+html,body{overflow-x:hidden;max-width:100vw}

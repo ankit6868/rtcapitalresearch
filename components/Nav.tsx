@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import { useModal } from "./ModalProvider";
 import type { NavItem } from "@/lib/types";
 
@@ -21,14 +22,24 @@ export default function Nav({
   logoFallback?: string;
 }) {
   const { open } = useModal();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    document.body.style.overflow = menuOpen ? "hidden" : "";
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
   const scrollTo = (href: string) => (e: React.MouseEvent) => {
     e.preventDefault();
+    setMenuOpen(false);
     if (href.startsWith("#")) {
-      document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+      // small delay so drawer closes before scrolling
+      setTimeout(() => document.querySelector(href)?.scrollIntoView({ behavior: "smooth" }), 60);
     } else {
       window.location.href = href;
     }
   };
+
   return (
     <header className="nav">
       <div className="container nav-inner">
@@ -47,6 +58,33 @@ export default function Nav({
         <div className="nav-cta">
           <button className="btn btn-ghost" onClick={() => open()}>Client Login</button>
           <button className="btn btn-dark btn-arrow" onClick={scrollTo("#contact")}>Book a Call</button>
+          <button
+            className="nav-burger"
+            aria-label="Open menu"
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <span></span><span></span><span></span>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile drawer */}
+      <div className={`nav-drawer${menuOpen ? " open" : ""}`} onClick={() => setMenuOpen(false)}>
+        <div className="nav-drawer-panel" onClick={(e) => e.stopPropagation()}>
+          <div className="nav-drawer-head">
+            <b>Menu</b>
+            <button className="nav-drawer-close" onClick={() => setMenuOpen(false)} aria-label="Close menu">×</button>
+          </div>
+          <nav className="nav-drawer-links">
+            {nav.map((n) => (
+              <a key={n.href} href={n.href} onClick={scrollTo(n.href)}>{n.label}</a>
+            ))}
+          </nav>
+          <div className="nav-drawer-cta">
+            <button className="btn btn-ghost" onClick={() => { setMenuOpen(false); open(); }}>Client Login</button>
+            <button className="btn btn-dark btn-arrow" onClick={scrollTo("#contact")}>Book a Call</button>
+          </div>
         </div>
       </div>
     </header>
