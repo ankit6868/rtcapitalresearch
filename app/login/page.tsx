@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 export default function Login() {
   const router = useRouter();
-  const [u, setU] = useState("admin");
+  const [u, setU] = useState("");
   const [p, setP] = useState("");
   const [err, setErr] = useState("");
   const [busy, setBusy] = useState(false);
@@ -46,7 +46,6 @@ export default function Login() {
           <input type="password" value={p} onChange={(e) => setP(e.target.value)} required autoComplete="current-password" />
         </div>
         <button className="a-btn a-btn-dark" disabled={busy}>{busy ? "Signing in..." : "Sign in"}</button>
-        <p style={{ marginTop: 18, fontSize: 12 }}>Default: admin / admin123 — change from Account after login.</p>
       </form>
     </div>
   );
